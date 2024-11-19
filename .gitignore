@@ -1,0 +1,4 @@
+config/
+dbs/
+logs/
+__pycache__/
