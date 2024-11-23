@@ -110,7 +110,7 @@ class Settings:
             self.settings = {
                 "messagesMaxSize":819200,
                 "port":port,
-                "bootstrapPeers": [{"ip":"127.0.0.1", "port":9000}],
+                "bootstrapPeers": [{"ip":"59.157.6.33", "port":8080}],
                 "stunServers": [
                     {"ip":"stun.l.google.com", "port":19302}, 
                     {"ip":"stun.l.google.com", "port":5349},
