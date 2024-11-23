@@ -32,6 +32,7 @@
             <h1>Chat List</h1>
             <ul>
                 {% for peer, chats in chatList.items() %}
+                {% if chats %}
                 <li class="list-group-item">
                     <span class="arrow" onclick="toggleList(this)"></span>
                     {{ peer }}
@@ -48,6 +49,7 @@
                         {% endfor %}
                     </ul>
                 </li>
+                {% endif %}
                 {% endfor %}
             </ul>
         </div>
