@@ -644,7 +644,7 @@ class Web:
     app = Flask(import_name="NanceChat", template_folder="src/templates")
     app.config["TEMPLATES_AUTO_RELOAD"] = True
     cursor = None
-    def __init__(self, host="0.0.0.0", port=8080):
+    def __init__(self, host="127.0.0.1", port=8080):
         self.host = host
         self.port = port
     @app.route("/")
