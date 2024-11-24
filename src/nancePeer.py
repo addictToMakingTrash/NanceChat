@@ -706,7 +706,7 @@ class Web:
                     messages.append({"messageUuid":messageUuid, "chatUuid":chatUuid, "name":name, "content":content, "timestamp":timestamp})
                     if not len(base64.b64encode(json.dumps({"m":"R","r":0,"c":{"messages":messages}}).encode("utf-8"))) < settings["messagesMaxSize"]:
                         return redirect(url_for("chat", _method="GET", id=chatUuid, status="1"))
-                    cursor.execute("INSERT INTO messages (uuid, chatUuid, name, content, timestamp) VALUES (?, ?, ?)", (str(uuid.uuid4()), chatUuid, name, content, datetime.datetime.timestamp(datetime.datetime.now())))
+                    cursor.execute("INSERT INTO messages (uuid, chatUuid, name, content, timestamp) VALUES (?, ?, ?, ?, ?)", (str(uuid.uuid4()), chatUuid, name, content, datetime.datetime.timestamp(datetime.datetime.now())))
                     conn.commit()
                     return redirect(url_for("chat", _method="GET", id=chatUuid, status="0"))
                 else:
@@ -751,6 +751,7 @@ class Web:
                 messages.reverse()
                 return render_template("chat.html", messages=messages, chatUuid=chatUuid, server=server, err=err)
         except:
+            logger.error(traceback.format_exc())
             return render_template("error.html")
     def runWeb(self):
         threading.Thread(target=Utils.openBrowser, args=(f"http://127.0.0.1:{self.port}",)).start()
