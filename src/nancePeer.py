@@ -166,7 +166,7 @@ class Utils:
                 except Exception as e:
                     logger.error(f"Error in checkAndMergeStunDatas:{e}")
                     continue
-                cursor.execute("DELETE FROM peers WHERE ip=?", (newPeerD["ip"],))
+                cursor.execute("DELETE FROM peers WHERE ip=? AND port=?", (newPeerD["ip"], newPeerD["port"]))
                 conn.commit()
                 cursor.execute("INSERT INTO peers (uuid, ip, port, natConeType, isLocalIp) VALUES (?, ?, ?, ?, ?)",(str(uuid.uuid4()), newPeerD["ip"], newPeerD["port"], newPeerD["natConeType"], 1 if Utils.isLocalIp(newPeerD["ip"]) else 0))
                 conn.commit()
@@ -333,7 +333,7 @@ class Server:
         client = Client(self.addr[0], self.addr[1])
         if client.ping():
             uuidValue = str(uuid.uuid4())
-            cursor.execute("DELETE FROM peers WHERE ip=?", (self.addr[0],))
+            cursor.execute("DELETE FROM peers WHERE ip=? AND port=?", (self.addr[0], self.addr[1]))
             conn.commit()
             cursor.execute("INSERT INTO peers (uuid, ip, port, natConeType, isLocalIp) VALUES (?, ?, ?, ?, ?)",(uuidValue, self.addr[0], self.addr[1], natConeType, 1 if isLocalIp else 0))
             conn.commit()
@@ -614,12 +614,12 @@ class Peer:
                 client = Client(peer[1], peer[2])
                 if not client.ping():
                     logger.warning(f"Dead Peer:{peer[1]}")
-                    cursor.execute("DELETE FROM peers WHERE ip=?", (peer[1],))
+                    cursor.execute("DELETE FROM peers WHERE ip=? AND port=?", (peer[1], peer[2]))
                     conn.commit()
                     continue
                 if not settings["amIBootstrapPeer"]:
                     client.getPeers()
-                    tempCustodyChats[peer[1]] = client.getChats()
+                    tempCustodyChats[f"{peer[1]}:{peer[2]}"] = client.getChats()
                     client.registerPeer()
             with custodyChatsLock:
                 custodyChats = tempCustodyChats
@@ -708,15 +708,15 @@ class Web:
                         return redirect(url_for("chat", _method="GET", id=chatUuid, status="1"))
                     cursor.execute("INSERT INTO messages (uuid, chatUuid, name, content, timestamp) VALUES (?, ?, ?)", (str(uuid.uuid4()), chatUuid, name, content, datetime.datetime.timestamp(datetime.datetime.now())))
                     conn.commit()
-                    return redirect(url_for("chat", _method="GET", id=chatUuid))
+                    return redirect(url_for("chat", _method="GET", id=chatUuid, status="0"))
                 else:
-                    cursor.execute("SELECT * FROM peers WHERE ip=?", (server,))
+                    cursor.execute("SELECT * FROM peers WHERE ip=? AND port=?", (server.split(":")[0], int(server.split(":")[1])))
                     peer = cursor.fetchall()
                     client = Client(peer[0][1], peer[0][2])
                     result = client.sendMessage(chatUuid, name, content)
                     time.sleep(2)
                     if result == 0:
-                        return redirect(url_for("chat", _method="GET", id=chatUuid, server=server))
+                        return redirect(url_for("chat", _method="GET", id=chatUuid, server=server, status="0"))
                     else:
                         return redirect(url_for("chat", _method="GET", id=chatUuid, server=server, status="1"))
             else:
@@ -725,13 +725,15 @@ class Web:
                 if not (chatUuid):
                     return redirect(url_for("chatList"))
                 server = request.args.get("server")
-                status = request.args.get("status", "0")
+                status = request.args.get("status", "-1")
                 status = int(status)
                 err = ""
                 if status == 1:
                     err = "チャットのサイズの制限でこれ以上は投稿できません。"
+                elif status == 0:
+                    err = "yaso"
                 if server:
-                    cursor.execute("SELECT * FROM peers WHERE ip=?", (server,))
+                    cursor.execute("SELECT * FROM peers WHERE ip=? AND port=?", (server.split(":")[0], int(server.split(":")[1])))
                     peer = cursor.fetchall()
                     client = Client(peer[0][1], peer[0][2])
                     messages = client.getMessages(chatUuid)

@@ -2,3 +2,4 @@ config/
 dbs/
 logs/
 __pycache__/
+.vscode/
