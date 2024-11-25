@@ -10,7 +10,30 @@
         {% block body %}
         <div class="container">
             <h1>NanceChat</h1>
-            <p>シンプルなチャットを提供します</p>
+            <p>P2Pのチャットソフト！</p>
+            <hr>
+            <div class="card-group">
+                <div class="card">
+                    <div class="card-header">
+                        初心者向け！
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">チャットリスト</h5>
+                        <p class="card-text">今あるチャットを探して話してみましょう！</p>
+                        <a href="chatList" class="btn btn-primary">Go!</a>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        もっと楽しくなったら？
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">チャット作成</h5>
+                        <p class="card-text">ぜひ実際のチャットを作ってみましょう！</p>
+                        <a href="newChat" class="btn btn-primary">Go!</a>
+                    </div>
+                </div>
+            </div>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
         {% endblock %}
