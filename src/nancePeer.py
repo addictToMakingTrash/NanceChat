@@ -601,13 +601,8 @@ class Peer:
             server.send(message)
     def syncer(self):
         global custodyChats
-        count = 0
         while True:
             tempCustodyChats:dict[list[dict]] = {}
-            if count % 4:
-                for server in settings["bootstrapPeers"]:
-                    client = Client(server["ip"], server["port"])
-                    client.getPeers()
             cursor.execute("SELECT * FROM peers")
             peers = cursor.fetchall()
             for peer in random.sample(peers, min(len(peers), 30)):
@@ -623,7 +618,6 @@ class Peer:
                     client.registerPeer()
             with custodyChatsLock:
                 custodyChats = tempCustodyChats
-            count += 1
             time.sleep(60)
     def start(self):
         threading.Thread(target=self.listenForMessages).start()
